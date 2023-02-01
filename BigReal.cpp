@@ -83,7 +83,14 @@ BigReal BigReal::operator-(BigReal& other){
     else{
         Res = new BigDecimalInt(BigDecimalInt(num1) - BigDecimalInt(num2));
     }
-    Res->decStr.insert(Res->decStr.length() - biggerA, 1, '.');
+    int len = Res->decStr.length();
+    if ((len - biggerA) < 0){
+        fill_Num_B_With_Zeros(biggerA - len, Res);
+        Res->decStr.insert(0, 1, '.');
+    }
+    else{
+        Res->decStr.insert(len - biggerA, 1, '.');
+    }
     if(negative_sign){
         Res->sign = '-';
     }
