@@ -108,6 +108,7 @@ ostream& operator <<(ostream& out, BigReal BigNumber){
     return out;
 }
 bool BigReal::operator==(BigReal other){
+    fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), other);
     string num1 = (this->BigReal_B->sign + this->BigReal_B->decStr + this->BigReal_A->decStr);
     string num2 = (other.BigReal_B->sign + other.BigReal_B->decStr + other.BigReal_A->decStr);
     bool res = (BigDecimalInt(num1) == BigDecimalInt(num2));
