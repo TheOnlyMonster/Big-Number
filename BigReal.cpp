@@ -32,21 +32,12 @@ BigReal BigReal::operator+(BigReal& other){
         this->BigReal_B->sign = '+';
         return other - *this;
     }
-
-
     if (this->fractionIndex < other.fractionIndex)
     {
         swap(*this, other);
     }
     fill_Num_B_With_Zeros(this->BigReal_B->decStr.length() - other.BigReal_B->decStr.length(), other.BigReal_B);
-    if (this->BigReal_A->decStr.length() > other.BigReal_A->decStr.length())
-    {
-        fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), other.BigReal_A);
-    }
-    else if (this->BigReal_A->decStr.length() < other.BigReal_A->decStr.length())
-    {
-        fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), this->BigReal_A);
-    }
+    fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), other);
     string num1 = (this->BigReal_B->sign + this->BigReal_B->decStr + this->BigReal_A->decStr);
     string num2 = (other.BigReal_B->sign + other.BigReal_B->decStr + other.BigReal_A->decStr);
     BigDecimalInt Res = BigDecimalInt(num2) + BigDecimalInt(num1);
@@ -66,14 +57,7 @@ BigReal BigReal::operator-(BigReal& other){
         swap(*this, other);
     }
     fill_Num_B_With_Zeros(this->BigReal_B->decStr.length() - other.BigReal_B->decStr.length(), other.BigReal_B);
-    if (this->BigReal_A->decStr.length() > other.BigReal_A->decStr.length())
-    {
-        fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), other.BigReal_A);
-    }
-    else if (this->BigReal_A->decStr.length() < other.BigReal_A->decStr.length())
-    {
-        fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), this->BigReal_A);
-    }
+    fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), other);
     string num1 = (this->BigReal_B->sign + this->BigReal_B->decStr + this->BigReal_A->decStr);
     string num2 = (other.BigReal_B->sign + other.BigReal_B->decStr + other.BigReal_A->decStr);
     BigDecimalInt *Res;
@@ -96,10 +80,19 @@ BigReal BigReal::operator-(BigReal& other){
     }
     return BigReal(Res->sign + Res->decStr);
 }
-void BigReal::fill_Num_A_With_Zeros(int num_of_zeros, BigDecimalInt *other){
+void BigReal::fill_Num_A_With_Zeros(int num_of_zeros, BigReal& other){
+    string temp;
     for (int i = 0; i < abs(num_of_zeros); i++)
     {
-        other->decStr += '0';
+        temp += '0';
+    }
+    if (this->BigReal_A->decStr.length() > other.BigReal_A->decStr.length())
+    {
+        other.BigReal_A->decStr += temp;
+    }
+    else if (this->BigReal_A->decStr.length() < other.BigReal_A->decStr.length())
+    {
+        this->BigReal_A->decStr += temp;
     }
 }
 void BigReal::fill_Num_B_With_Zeros(int num_of_zeros, BigDecimalInt *other){
@@ -121,12 +114,14 @@ bool BigReal::operator==(BigReal other){
     return res;
 }
 bool BigReal::operator>(BigReal other){
+    fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), other);
     string num1 = (this->BigReal_B->sign + this->BigReal_B->decStr + this->BigReal_A->decStr);
     string num2 = (other.BigReal_B->sign + other.BigReal_B->decStr + other.BigReal_A->decStr);
     bool res = (BigDecimalInt(num1) > BigDecimalInt(num2));
     return res;
 }
 bool BigReal::operator<(BigReal other){
+    fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), other);
     string num1 = (this->BigReal_B->sign + this->BigReal_B->decStr + this->BigReal_A->decStr);
     string num2 = (other.BigReal_B->sign + other.BigReal_B->decStr + other.BigReal_A->decStr);
     bool res = (BigDecimalInt(num1) < BigDecimalInt(num2));

@@ -25,7 +25,7 @@ class BigReal{
         string realStr; // This Member Stores The Whole Number With The Fraction Point Value After Removing Unwanted Zeros & '+' or '-' Signs
         BigDecimalInt *BigReal_A; // This Pointer Points To The Number After The Fraction Point
         BigDecimalInt *BigReal_B; // This Pointer Points To The Number Before The Fraction Point
-        void fill_Num_A_With_Zeros(int, BigDecimalInt *); // This Function Fills Num After The Fraction Point With Zeros
+        void fill_Num_A_With_Zeros(int, BigReal &); // This Function Fills Num After The Fraction Point With Zeros
         void fill_Num_B_With_Zeros(int, BigDecimalInt *); // This Function Fills Num Before The Fraction Point With Zeros
     public:
         BigReal(string);
