@@ -1,22 +1,57 @@
-# Big-Number
- This program let the user do mathmatical operations on infinite numbers.
+# BigNumber Library
 
-Different variations of types int and float exist in C++ and other languages. They are limited by minimum and maximum values depending on the number of bytes used to 
-store the number. Moreover, sometimes users might need versions of these types with unlimited bounds. Java solves this problem by providing BigInteger and BigDecimal 
-classes. As a result, I developed two new C++ types (classes) that can hold unlimited decimal and real values and performs arithmetic operations on them. 
+This repository contains a C++ library for working with BigNumber objects, which represent large numerical values stored as strings of decimal digits. The library provides support for standard comparison and mathematical operations, such as `<`, `>`, `==`, `+`, and `-`. It also includes an overload for the `<<` operator to print BigNumber objects to the console.
 
-The first class called BigDecimalInt. This class stores infinite numbers without fractions and can performs arithmetic operations on them. BigDecimalInt class have the 
-following attribute:<br />
+## Installation
 
-• <strong>Sign</strong>. The default sign for the big number is '+' unless the user enters '-' sign.<br />
-• <strong>decStr</strong>. this member stores the big number value after removing unwanted zeros & '+' or '-' signs.<br />
-Furthermore, I created the following functions in order to make my code clean.<br />
-• <strong>remove_Unwanted_Zeros</strong>. This function removes unwanted zeros in the left side of the big number e.g. "000023341"<br />
-• <strong>fill_Num_With_Zeros</strong>. This function is called when we want to add zeros in the left side of the big number e.g. "0065" + "9812"<br />
+To use this library in your C++ project, follow these steps:
 
-On the other hand, the second class called BigReal this class extends the first one and can store infinite numbers with fractions. In order to do so, I stored the 
-integer and fraction parts in two separate pointers of type BigDecimalInt.<br />
+1. Clone the repository or download the source code files.
+2. Include the `header.h` file in your project.
 
-• <strong>BigReal_A</strong>. This pointer points to the number after the fraction point.<br />
-• <strong>BigReal_B</strong>. This pointer points to the number before the fraction point.<br />
-Also, I stored the fraction point index in a member of type int called <strong>fractionIndex</strong>.
+```cpp
+#include "header.h"
+```
+## Usage
+## BigNumber Class
+
+The `BigNumber` class is an abstract base class that defines the common interface for working with large numbers. It includes the following pure virtual member functions:
+
+• `bool operator<(BigNumber&)`: Overloaded operator to check if one `BigNumber` object is less than another.
+• `bool operator>(BigNumber&)`: Overloaded operator to check if one `BigNumber` object is greater than another.
+• `bool operator==(BigNumber&)`: Overloaded operator to compare two `BigNumber` objects.
+• `BigNumber& operator+(BigNumber&)`: Overloaded operator to add two `BigNumber` objects.
+• `BigNumber& operator-(BigNumber&)`: Overloaded operator to subtract two `BigNumber` objects.
+
+## BigDecimalInt Class
+
+The `BigDecimalInt` class is derived from `BigNumber` and represents an integer number with a decimal point. It provides methods to compare, add, and subtract values with other `BigNumber` objects. The constructor takes a string as a parameter to initialize the instance.
+
+## BigReal Class
+
+The `BigReal` class is also derived from `BigNumber` and is designed to hold large real numbers. It implements addition, subtraction, comparison, and equality operators. The constructor takes a string as a parameter to initialize the instance.
+
+## Example
+
+Here's a simple example demonstrating the usage of the `BigNumber` library:
+```cpp
+#include <iostream>
+#include "header.h"
+
+int main() {
+    // Create BigDecimalInt objects
+    BigDecimalInt num1("123456789");
+    BigDecimalInt num2("987654321");
+
+    // Add two BigDecimalInt objects
+    BigNumber& sum = num1 + num2;
+
+    // Print the result
+    std::cout << "Sum: " << sum << std::endl;
+
+    return 0;
+}
+```
+## Contributing
+
+Contributions to this library are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
