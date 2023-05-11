@@ -1,39 +1,76 @@
 #ifndef HEADER_H
 #define HEADER_H
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
 using namespace std;
-class BigDecimalInt{
-    private:
-        char sign = '+'; // The Default Sign for The Big Number Is + Unless The User Enters '-' Sign
-        string decStr; // This Member Stores The Big Number Value After Removing Unwanted Zeros & '+' or '-' Signs
-        void remove_Unwanted_Zeros(string &); // This Function Removes Unwanted Zeros In The Left Side of The Big Number e.g. "000023341"
-        void fill_Num_With_Zeros(int, BigDecimalInt &); // This Function Is Called When We want to Add Zeros In The Left Side of The Big Number e.g. "0065" + "9812"
+/* 
+This class represents a BigNumber, which is a numerical value stored as a string of decimal digits. 
+It supports standard comparison and mathematical operations, such as <, >, ==, + and -. 
+It also defines an overload for the << operator for printing a BigNumber to the console.
+*/
+class BigNumber {
+    protected:
+        // Sign of the number
+        char sign = '+';
+        // String representation of the number
+        std::string decStr;
     public:
-        friend class BigReal;
-        BigDecimalInt(string);
-        bool operator<(BigDecimalInt);
-        bool operator>(BigDecimalInt);
-        bool operator==(BigDecimalInt);
-        BigDecimalInt operator+(BigDecimalInt);
-        BigDecimalInt operator-(BigDecimalInt);
-        friend ostream& operator <<(ostream&, BigDecimalInt);
+        // Overloaded operator to check if one BigNumber object is less than another
+        virtual bool operator<(BigNumber&) = 0;
+        // Overloaded operator to check if one BigNumber object is greater than another
+        virtual bool operator>(BigNumber&) = 0;
+        // Overloaded operator to compare two BigNumber objects
+        virtual bool operator==(BigNumber&) = 0;
+        // Overloaded operator to add two BigNumber objects
+        virtual BigNumber& operator+(BigNumber&) = 0;
+        // Overloaded operator to subtract two BigNumber objects
+        virtual BigNumber& operator-(BigNumber&) = 0;
+        friend std::ostream& operator<<(std::ostream& out, const BigNumber& other){
+            out << other.sign << other.decStr;
+            return out;
+        }
 };
-class BigReal{
+/* 
+BigDecimalInt class represents an integer number that has a decimal point and uses BigNumber as its base class.
+This class has several methods to compare, add, and subtract values with other BigNumber objects.
+It also takes a string as a parameter when creating an instance. Additionally, it also has private methods to remove and add leading zeros.
+*/
+class BigDecimalInt : public BigNumber {
+private:
+    void removeLeadingZeros(std::string&);
+    void addLeadingZeros(int, BigDecimalInt&);
+public:
+    friend class BigReal;
+    BigDecimalInt(std::string);
+    bool operator<(BigNumber&) override;
+    bool operator>(BigNumber&) override;
+    bool operator==(BigNumber&) override;
+    BigDecimalInt& operator+(BigNumber&) override;
+    BigDecimalInt& operator-(BigNumber&) override;
+};
+/*
+This class provides an implementation of the BigNumber abstract class, designed to hold large real numbers. 
+It has implementations of addition, subtraction, comparison, and equality operators. 
+It also contains private methods to pad zeros before and after the decimal point.
+*/
+class BigReal : public BigNumber {
     private:
-        char sign = '+'; // The Default Sign for The Big Number Is + Unless The User Enters '-' Sign
-        int fractionIndex; // This Member Stores The Fraction Point Index
-        string realStr; // This Member Stores The Whole Number With The Fraction Point Value After Removing Unwanted Zeros & '+' or '-' Signs
-        BigDecimalInt *BigReal_A; // This Pointer Points To The Number After The Fraction Point
-        BigDecimalInt *BigReal_B; // This Pointer Points To The Number Before The Fraction Point
-        void fill_Num_A_With_Zeros(int, BigReal &); // This Function Fills Num After The Fraction Point With Zeros
-        void fill_Num_B_With_Zeros(int, BigDecimalInt *); // This Function Fills Num Before The Fraction Point With Zeros
+        // Index of the decimal point
+        int fractionIndex;
+        // Pointers to two BigDecimalInt objects
+        BigDecimalInt *numAfterPoint;
+        BigDecimalInt *numBeforePoint;
+        // Function to fill the first BigDecimalInt object with zeros
+        void padZerosAfterDecimal(int, BigReal &);
+        // Function to fill the second BigDecimalInt object with zeros
+        void padZerosBeforeDecimal(int, BigDecimalInt *);
     public:
+        // Constructor to initialize the BigReal object
         BigReal(string);
-        BigReal operator+(BigReal&); 
-        BigReal operator-(BigReal&);
-        friend ostream& operator <<(ostream&, BigReal);
-        bool operator==(BigReal);
-        bool operator>(BigReal);
-        bool operator<(BigReal);
+        BigReal& operator+(BigNumber&) override; 
+        BigReal& operator-(BigNumber&) override;
+        bool operator==(BigNumber&) override;
+        bool operator>(BigNumber&) override;
+        bool operator<(BigNumber&) override;
 };
 #endif

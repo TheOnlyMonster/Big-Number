@@ -10,66 +10,76 @@ BigReal::BigReal(string realNumber){
         }
     }
     realNumber.erase(this->fractionIndex, 1);
-    BigReal_B = new BigDecimalInt(realNumber.substr(0,this->fractionIndex));
+    numBeforePoint = new BigDecimalInt(realNumber.substr(0,this->fractionIndex));
     reverse(realNumber.begin() + this->fractionIndex, realNumber.end());
-    BigDecimalInt *BigReal_A_Temp = new BigDecimalInt(realNumber.substr(this->fractionIndex));
-    reverse(BigReal_A_Temp->decStr.begin(), BigReal_A_Temp->decStr.end());
-    BigReal_A = BigReal_A_Temp;
-    this->fractionIndex = BigReal_B->decStr.length() - 1;
-    this->realStr = BigReal_B->decStr + '.' + BigReal_A->decStr;
-    this->sign = this->BigReal_B->sign;
+    BigDecimalInt *numAfterPoint_Temp = new BigDecimalInt(realNumber.substr(this->fractionIndex));
+    reverse(numAfterPoint_Temp->decStr.begin(), numAfterPoint_Temp->decStr.end());
+    numAfterPoint = numAfterPoint_Temp;
+    this->fractionIndex = numBeforePoint->decStr.length() - 1;
+    this->decStr = numBeforePoint->decStr + '.' + numAfterPoint->decStr;
+    this->sign = this->numBeforePoint->sign;
 }
-BigReal BigReal::operator+(BigReal& other){
-    int biggerA = max(this->BigReal_A->decStr.length(), other.BigReal_A->decStr.length());
+BigReal& BigReal::operator+(BigNumber& other){
+    BigReal& otherBigReal = dynamic_cast<BigReal&>(other);
+    int biggerA = max(this->numAfterPoint->decStr.length(), otherBigReal.numAfterPoint->decStr.length());
 
-    if (this->BigReal_B->sign == '+' && other.BigReal_B->sign == '-')
+    if (this->numBeforePoint->sign == '+' && otherBigReal.numBeforePoint->sign == '-')
     {
-        other.BigReal_B->sign = '+';
-        return *this - other;
+        otherBigReal.numBeforePoint->sign = '+';
+        return *this - otherBigReal;
     }
-    else if (this->BigReal_B->sign == '-' && other.BigReal_B->sign == '+')
+    else if (this->numBeforePoint->sign == '-' && otherBigReal.numBeforePoint->sign == '+')
     {
-        this->BigReal_B->sign = '+';
-        return other - *this;
+        this->numBeforePoint->sign = '+';
+        return otherBigReal - *this;
     }
-    if (this->fractionIndex < other.fractionIndex)
+    if (this->fractionIndex < otherBigReal.fractionIndex)
     {
-        swap(*this, other);
+        swap(*this, otherBigReal);
     }
-    fill_Num_B_With_Zeros(this->BigReal_B->decStr.length() - other.BigReal_B->decStr.length(), other.BigReal_B);
-    fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), other);
-    string num1 = (this->BigReal_B->sign + this->BigReal_B->decStr + this->BigReal_A->decStr);
-    string num2 = (other.BigReal_B->sign + other.BigReal_B->decStr + other.BigReal_A->decStr);
-    BigDecimalInt Res = BigDecimalInt(num2) + BigDecimalInt(num1);
+    padZerosBeforeDecimal(this->numBeforePoint->decStr.length() - otherBigReal.numBeforePoint->decStr.length(), otherBigReal.numBeforePoint);
+    padZerosAfterDecimal(this->numAfterPoint->decStr.length() - otherBigReal.numAfterPoint->decStr.length(), otherBigReal);
+    string num1 = (this->numBeforePoint->sign + this->numBeforePoint->decStr + this->numAfterPoint->decStr);
+    string num2 = (otherBigReal.numBeforePoint->sign + otherBigReal.numBeforePoint->decStr + otherBigReal.numAfterPoint->decStr);
+    BigNumber *myNum = new BigDecimalInt(num1);
+    dynamic_cast<BigDecimalInt*>(myNum);
+    BigDecimalInt &Res = BigDecimalInt(num2) + *myNum;
     Res.decStr.insert(Res.decStr.length() - biggerA, 1, '.');
-    return BigReal(Res.sign + Res.decStr);
+    BigReal* result = new BigReal(Res.sign + Res.decStr);
+    return *result;
 }
-BigReal BigReal::operator-(BigReal& other){
-    int biggerA = max(this->BigReal_A->decStr.length(), other.BigReal_A->decStr.length());
-    bool negative_sign = false, isSwaped = false;
-    if (this->fractionIndex < other.fractionIndex)
+BigReal& BigReal::operator-(BigNumber& other){
+    BigReal& otherBigReal = dynamic_cast<BigReal&>(other);
+    int biggerA = max(this->numAfterPoint->decStr.length(), otherBigReal.numAfterPoint->decStr.length());
+    bool negative_sign = false, isSwapped = false;
+    if (this->fractionIndex < otherBigReal.fractionIndex)
     {
-        if (other.BigReal_B->sign == '+')
+        if (otherBigReal.numBeforePoint->sign == '+')
         {
             negative_sign = true;
         }
-        isSwaped = true;
-        swap(*this, other);
+        isSwapped = true;
+        swap(*this, otherBigReal);
     }
-    fill_Num_B_With_Zeros(this->BigReal_B->decStr.length() - other.BigReal_B->decStr.length(), other.BigReal_B);
-    fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), other);
-    string num1 = (this->BigReal_B->sign + this->BigReal_B->decStr + this->BigReal_A->decStr);
-    string num2 = (other.BigReal_B->sign + other.BigReal_B->decStr + other.BigReal_A->decStr);
+    padZerosBeforeDecimal(this->numBeforePoint->decStr.length() - otherBigReal.numBeforePoint->decStr.length(), otherBigReal.numBeforePoint);
+    padZerosAfterDecimal(this->numAfterPoint->decStr.length() - otherBigReal.numAfterPoint->decStr.length(), otherBigReal);
+    string num1 = (this->numBeforePoint->sign + this->numBeforePoint->decStr + this->numAfterPoint->decStr);
+    string num2 = (otherBigReal.numBeforePoint->sign + otherBigReal.numBeforePoint->decStr + otherBigReal.numAfterPoint->decStr);
     BigDecimalInt *Res;
-    if(isSwaped){
-        Res = new BigDecimalInt(BigDecimalInt(num2) - BigDecimalInt(num1));
+    BigNumber *myNum;
+    if(isSwapped){
+        myNum = new BigDecimalInt(num1);
+        dynamic_cast<BigDecimalInt*>(myNum);
+        Res = new BigDecimalInt(BigDecimalInt(num2) - *myNum);
     }
     else{
-        Res = new BigDecimalInt(BigDecimalInt(num1) - BigDecimalInt(num2));
+        myNum = new BigDecimalInt(num2);
+        dynamic_cast<BigDecimalInt*>(myNum);
+        Res = new BigDecimalInt(BigDecimalInt(num1) - *myNum);
     }
     int len = Res->decStr.length();
     if ((len - biggerA) < 0){
-        fill_Num_B_With_Zeros(biggerA - len, Res);
+        padZerosBeforeDecimal(biggerA - len, Res);
         Res->decStr.insert(0, 1, '.');
     }
     else{
@@ -78,53 +88,59 @@ BigReal BigReal::operator-(BigReal& other){
     if(negative_sign){
         Res->sign = '-';
     }
-    return BigReal(Res->sign + Res->decStr);
+    BigReal* result = new BigReal(Res->sign + Res->decStr);
+    return *result;
 }
-void BigReal::fill_Num_A_With_Zeros(int num_of_zeros, BigReal& other){
+void BigReal::padZerosAfterDecimal(int numOfZeros, BigReal& other){
     string temp;
-    for (int i = 0; i < abs(num_of_zeros); i++)
+    for (int i = 0; i < abs(numOfZeros); i++)
     {
         temp += '0';
     }
-    if (this->BigReal_A->decStr.length() > other.BigReal_A->decStr.length())
+    if (this->numAfterPoint->decStr.length() > other.numAfterPoint->decStr.length())
     {
-        other.BigReal_A->decStr += temp;
+        other.numAfterPoint->decStr += temp;
     }
-    else if (this->BigReal_A->decStr.length() < other.BigReal_A->decStr.length())
+    else if (this->numAfterPoint->decStr.length() < other.numAfterPoint->decStr.length())
     {
-        this->BigReal_A->decStr += temp;
+        this->numAfterPoint->decStr += temp;
     }
 }
-void BigReal::fill_Num_B_With_Zeros(int num_of_zeros, BigDecimalInt *other){
+void BigReal::padZerosBeforeDecimal(int numOfZeros, BigDecimalInt *other){
     string temp;
-    for (int i = 0; i < num_of_zeros; i++)
+    for (int i = 0; i < numOfZeros; i++)
     {
         temp += '0';
     }
     other->decStr = temp + other->decStr;
 }
-ostream& operator <<(ostream& out, BigReal BigNumber){
-    out << BigNumber.sign << BigNumber.realStr;
-    return out;
-}
-bool BigReal::operator==(BigReal other){
-    fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), other);
-    string num1 = (this->BigReal_B->sign + this->BigReal_B->decStr + this->BigReal_A->decStr);
-    string num2 = (other.BigReal_B->sign + other.BigReal_B->decStr + other.BigReal_A->decStr);
-    bool res = (BigDecimalInt(num1) == BigDecimalInt(num2));
+bool BigReal::operator==(BigNumber& other){
+    BigReal& otherBigReal = dynamic_cast<BigReal&>(other);
+    padZerosAfterDecimal(this->numAfterPoint->decStr.length() - otherBigReal.numAfterPoint->decStr.length(), otherBigReal);
+    string num1 = (this->numBeforePoint->sign + this->numBeforePoint->decStr + this->numAfterPoint->decStr);
+    string num2 = (otherBigReal.numBeforePoint->sign + otherBigReal.numBeforePoint->decStr + otherBigReal.numAfterPoint->decStr);
+    BigNumber *myNum = new BigDecimalInt(num2);
+    dynamic_cast<BigDecimalInt*>(myNum);
+    bool res = (BigDecimalInt(num1) == *myNum);
     return res;
 }
-bool BigReal::operator>(BigReal other){
-    fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), other);
-    string num1 = (this->BigReal_B->sign + this->BigReal_B->decStr + this->BigReal_A->decStr);
-    string num2 = (other.BigReal_B->sign + other.BigReal_B->decStr + other.BigReal_A->decStr);
-    bool res = (BigDecimalInt(num1) > BigDecimalInt(num2));
+bool BigReal::operator>(BigNumber& other){
+    BigReal& otherBigReal = dynamic_cast<BigReal&>(other);
+    padZerosAfterDecimal(this->numAfterPoint->decStr.length() - otherBigReal.numAfterPoint->decStr.length(), otherBigReal);
+    string num1 = (this->numBeforePoint->sign + this->numBeforePoint->decStr + this->numAfterPoint->decStr);
+    string num2 = (otherBigReal.numBeforePoint->sign + otherBigReal.numBeforePoint->decStr + otherBigReal.numAfterPoint->decStr);
+    BigNumber *myNum = new BigDecimalInt(num2);
+    dynamic_cast<BigDecimalInt*>(myNum);
+    bool res = (BigDecimalInt(num1) > *myNum);
     return res;
 }
-bool BigReal::operator<(BigReal other){
-    fill_Num_A_With_Zeros(this->BigReal_A->decStr.length() - other.BigReal_A->decStr.length(), other);
-    string num1 = (this->BigReal_B->sign + this->BigReal_B->decStr + this->BigReal_A->decStr);
-    string num2 = (other.BigReal_B->sign + other.BigReal_B->decStr + other.BigReal_A->decStr);
-    bool res = (BigDecimalInt(num1) < BigDecimalInt(num2));
+bool BigReal::operator<(BigNumber& other){
+    BigReal& otherBigReal = dynamic_cast<BigReal&>(other);
+    padZerosAfterDecimal(this->numAfterPoint->decStr.length() - otherBigReal.numAfterPoint->decStr.length(), otherBigReal);
+    string num1 = (this->numBeforePoint->sign + this->numBeforePoint->decStr + this->numAfterPoint->decStr);
+    string num2 = (otherBigReal.numBeforePoint->sign + otherBigReal.numBeforePoint->decStr + otherBigReal.numAfterPoint->decStr);
+    BigNumber *myNum = new BigDecimalInt(num2);
+    dynamic_cast<BigDecimalInt*>(myNum);
+    bool res = (BigDecimalInt(num1) < *myNum);
     return res;
 }
