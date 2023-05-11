@@ -12,7 +12,6 @@ To use this library in your C++ project, follow these steps:
 ```cpp
 #include "header.h"
 ```
-## Usage
 ## BigNumber Class
 
 The `BigNumber` class is an abstract base class that defines the common interface for working with large numbers. It includes the following pure virtual member functions:
