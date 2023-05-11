@@ -18,9 +18,13 @@ To use this library in your C++ project, follow these steps:
 The `BigNumber` class is an abstract base class that defines the common interface for working with large numbers. It includes the following pure virtual member functions:
 
 • `bool operator<(BigNumber&)`: Overloaded operator to check if one `BigNumber` object is less than another.
+
 • `bool operator>(BigNumber&)`: Overloaded operator to check if one `BigNumber` object is greater than another.
+
 • `bool operator==(BigNumber&)`: Overloaded operator to compare two `BigNumber` objects.
+
 • `BigNumber& operator+(BigNumber&)`: Overloaded operator to add two `BigNumber` objects.
+
 • `BigNumber& operator-(BigNumber&)`: Overloaded operator to subtract two `BigNumber` objects.
 
 ## BigDecimalInt Class
